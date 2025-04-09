@@ -1,51 +1,45 @@
-import { Veterinario } from "../models/Veterinario";
-
-let listaVeterinarios: Veterinario[] = [
-  {
-    id: 1,
-    nome: "Dra. Ana Souza",
-    crmv: "12345",
-    estado: "BA",
-    ccpsId: 1,
-    fotoUrl: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: 2,
-    nome: "Dr. João Lima",
-    crmv: "54321",
-    estado: "BA",
-    ccpsId: 1,
-  },
-];
+import { DZSQLiteInsert, DZSQLiteSelect, DZSQLiteUpdate, DZSQLiteDelete } from "@/src/db/drizzlesqlite";
+import { veterinariosTable } from "@/src/db/schema";
+import { eq } from "drizzle-orm";
+import { Veterinario } from "@/src/models/Veterinario";
 
 export const VeterinarioService = {
-  listarPorCcps: (ccpsId: number): Veterinario[] => {
-    return listaVeterinarios.filter((v) => v.ccpsId === ccpsId);
+  async listarPorCcps(ccpsId: number): Promise<Veterinario[]> {
+    const todos = await DZSQLiteSelect<Veterinario>(veterinariosTable);
+    console.log("Todos os veterinários:", todos);
+    console.log("ccpsId (filtro):", ccpsId, typeof ccpsId);
+    console.log("todos[0].ccpsId:", todos[0]?.ccpsId, typeof todos[0]?.ccpsId);
+    return todos.filter(v => Number( v.ccpsId === ccpsId));
   },
-
-  remover: (id: number) => {
-    listaVeterinarios = listaVeterinarios.filter((v) => v.id !== id);
-  },
-
-  adicionar: (novo: Veterinario) => {
-    novo.id = Date.now();
-    listaVeterinarios.push(novo);
-  },
-
-  editar: (v: Veterinario) => {
-    const index = listaVeterinarios.findIndex((x) => x.id === v.id);
-    if (index !== -1) {
-      listaVeterinarios[index] = v;
-    }
-  },
-  salvarOuAtualizar : (v: Veterinario) => {
-    const index = listaVeterinarios.findIndex((vet) => vet.id === v.id);
-    if (index >= 0) {
-      listaVeterinarios[index] = v;
-    } else {
-      listaVeterinarios.push(v);
-    }
-  }  
-
   
+
+  async salvar(v: Omit<Veterinario, "id">) {
+    console.log("Dados que vão ser inseridos:", v);
+    try {
+      console.log("Veterinário service " + v.crmv);
+      await DZSQLiteInsert(veterinariosTable, v);
+      console.log("Veterinário inserido com sucesso!");
+    } catch (error) {
+      console.error("Erro ao inserir veterinário:", error);
+    }
+  },
+
+  async atualizar(v: Veterinario) {
+    await DZSQLiteUpdate(veterinariosTable, {
+      set: {
+        nome: v.nome,
+        crmv: v.crmv,
+        estado: v.estado,
+        fotoUrl: v.fotoUrl,
+        ccpsId: v.ccpsId,
+      },
+      where: eq(veterinariosTable.id, v.id!),
+    });
+  },
+
+  async remover(id: number) {
+    await DZSQLiteDelete(veterinariosTable, {
+      where: eq(veterinariosTable.id, id)
+    });
+  }
 };

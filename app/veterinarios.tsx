@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useEffect, useState } from "react";
 import FlatListVeterinarios from "@/components/VeterinarioFlatList";
-import { Veterinario } from "@/models/Veterinario";
+import { Veterinario } from "@/src/models/Veterinario";
 import { VeterinarioService } from "@/services/VeterinarioService";
 import VeterinarioModal from "@/components/VeterinarioModal";
+import { initializeDatabase } from "@/src/db/dbInit";
+
 
 export default function Veterinarios() {
   const [veterinarios, setVeterinarios] = useState<Veterinario[]>([]);
@@ -21,19 +23,33 @@ export default function Veterinarios() {
     setModalVisivel(true);
   };
 
-  const salvarVeterinario = (v: Veterinario) => {
-    VeterinarioService.salvarOuAtualizar(v);
-    setVeterinarios(VeterinarioService.listarPorCcps(ccpsId));
-  };
-
   useEffect(() => {
-    const dados = VeterinarioService.listarPorCcps(ccpsId);
-    setVeterinarios(dados);
+    const carregarVeterinarios = async () => {
+      initializeDatabase();
+      const dados = await VeterinarioService.listarPorCcps(ccpsId);
+      setVeterinarios(dados);
+    };
+
+    carregarVeterinarios();
   }, []);
 
-  const removerVeterinario = (id: number) => {
-    VeterinarioService.remover(id);
-    setVeterinarios(VeterinarioService.listarPorCcps(ccpsId));
+  const salvarNovoVeterinario = async (v: Omit<Veterinario, "id">) => {
+    await VeterinarioService.salvar(v);
+    const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
+    setVeterinarios(atualizados);
+  };
+  
+  const atualizarVeterinario = async (v: Veterinario) => {
+    await VeterinarioService.atualizar(v);
+    const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
+    setVeterinarios(atualizados);
+  };
+  
+
+  const removerVeterinario = async (id: number) => {
+    await VeterinarioService.remover(id);
+    const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
+    setVeterinarios(atualizados);
   };
 
   return (
@@ -49,13 +65,14 @@ export default function Veterinarios() {
       <VeterinarioModal
         visible={modalVisivel}
         onClose={() => setModalVisivel(false)}
-        onSalvar={salvarVeterinario}
+        onSalvar={salvarNovoVeterinario}
+        onAtualizar={atualizarVeterinario}
         veterinarioSelecionado={veterinarioSelecionado}
       />
 
       <TouchableOpacity
         style={styles.botaoFlutuante}
-        onPress={() => setModalVisivel(true)}
+        onPress={abrirModalParaAdicionar}
       >
         <Text style={styles.icone}>＋</Text>
       </TouchableOpacity>

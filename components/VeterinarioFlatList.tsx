@@ -1,11 +1,12 @@
 import { FlatList, View, Text, Button, StyleSheet, Image } from "react-native";
-import { Veterinario } from "../models/Veterinario";
+import { Veterinario } from "@/src/models/Veterinario";
 
 type Props = {
   veterinarios: Veterinario[];
   onRemover: (id: number) => void;
   onEditar: (veterinario: Veterinario) => void;
 };
+
 
 export default function FlatListVeterinarios({
   veterinarios,
