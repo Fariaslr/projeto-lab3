@@ -16,8 +16,11 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@libsql/client": "^0.15.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
+    "ccps-lab3": "file:",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.41.0",
     "expo": "~52.0.43",
     "expo-blur": "~14.0.3",
@@ -58,6 +61,7 @@
     "jest": "^29.2.1",
     "jest-expo": "~52.0.6",
     "react-test-renderer": "18.3.1",
+    "tsx": "^4.19.3",
     "typescript": "^5.3.3"
   },
   "private": true
