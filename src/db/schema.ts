@@ -2,7 +2,7 @@ import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const DATABASE_NAME = "ccps.db";
 
-export const ccps = sqliteTable("ccps", {
+export const ccpsTable = sqliteTable("ccps", {
   id: text("id").primaryKey().notNull(),
   nomeEstabelecimento: text("nome_estabelecimento").notNull(),
   cnpj: text("cnpj").notNull(),
