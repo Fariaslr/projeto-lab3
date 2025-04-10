@@ -4,7 +4,7 @@ import FlatListVeterinarios from "@/components/VeterinarioFlatList";
 import { Veterinario } from "@/src/models/Veterinario";
 import { VeterinarioService } from "@/services/VeterinarioService";
 import VeterinarioModal from "@/components/VeterinarioModal";
-import { initializeDatabase } from "@/src/db/dbInit";
+import { dropDatabase, initializeDatabase } from "@/src/db/dbInit";
 
 
 export default function Veterinarios() {
@@ -12,16 +12,6 @@ export default function Veterinarios() {
   const [veterinarioSelecionado, setVeterinarioSelecionado] = useState<Veterinario | null>(null); // <- aqui
   const [modalVisivel, setModalVisivel] = useState(false);
   const ccpsId = 1;
-
-  const abrirModalParaAdicionar = () => {
-    setVeterinarioSelecionado(null);
-    setModalVisivel(true);
-  };
-
-  const abrirModalParaEditar = (v: Veterinario) => {
-    setVeterinarioSelecionado(v);
-    setModalVisivel(true);
-  };
 
   useEffect(() => {
     const carregarVeterinarios = async () => {
@@ -32,6 +22,16 @@ export default function Veterinarios() {
 
     carregarVeterinarios();
   }, []);
+
+  const abrirModalParaAdicionar = () => {
+    setVeterinarioSelecionado(null);
+    setModalVisivel(true);
+  };
+
+  const abrirModalParaEditar = (v: Veterinario) => {
+    setVeterinarioSelecionado(v);
+    setModalVisivel(true);
+  };  
 
   const salvarNovoVeterinario = async (v: Omit<Veterinario, "id">) => {
     await VeterinarioService.salvar(v);
@@ -46,7 +46,7 @@ export default function Veterinarios() {
   };
   
 
-  const removerVeterinario = async (id: number) => {
+  const removerVeterinario = async (id: string) => {
     await VeterinarioService.remover(id);
     const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
     setVeterinarios(atualizados);
@@ -83,7 +83,7 @@ export default function Veterinarios() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 10,
     paddingHorizontal: 16,
     backgroundColor: "#fff",
   },
@@ -109,6 +109,5 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 28,
     fontWeight: "bold",
-  },
-
+  }
 });

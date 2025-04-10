@@ -29,7 +29,6 @@ export const VeterinarioService = {
       set: {
         nome: v.nome,
         crmv: v.crmv,
-        estado: v.estado,
         fotoUrl: v.fotoUrl,
         ccpsId: v.ccpsId,
       },
@@ -37,7 +36,7 @@ export const VeterinarioService = {
     });
   },
 
-  async remover(id: number) {
+  async remover(id: string) {
     await DZSQLiteDelete(veterinariosTable, {
       where: eq(veterinariosTable.id, id)
     });
