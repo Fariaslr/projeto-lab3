@@ -9,7 +9,7 @@ import { initializeDatabase } from "@/src/db/dbInit";
 
 export default function Veterinarios() {
   const [veterinarios, setVeterinarios] = useState<Veterinario[]>([]);
-  const [veterinarioSelecionado, setVeterinarioSelecionado] = useState<Veterinario | null>(null); // <- aqui
+  const [veterinarioSelecionado, setVeterinarioSelecionado] = useState<Veterinario | null>(null);
   const [modalVisivel, setModalVisivel] = useState(false);
   const ccpsId = 1;
 
@@ -83,7 +83,7 @@ export default function Veterinarios() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 20,
     paddingHorizontal: 16,
     backgroundColor: "#fff",
   },

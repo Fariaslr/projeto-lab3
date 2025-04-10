@@ -6,7 +6,8 @@ export const veterinariosTable = sqliteTable("veterinarios", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   nome: text("nome").notNull(),
   crmv: text("crmv").notNull(),
-  estado: text("estado").notNull(),
+  cep: text("cep").notNull(),
+  endereco: text("endereco"),
   fotoUrl: text("fotoUrl"),
   ccpsId: integer("ccpsId").notNull(),
 });

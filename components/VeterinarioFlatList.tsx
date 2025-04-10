@@ -1,5 +1,5 @@
 import { FlatList, View, Text, Button, StyleSheet, Image } from "react-native";
-import { Veterinario } from "@/src/models/Veterinario";
+import { Veterinario } from '../src/models/Veterinario';
 
 type Props = {
   veterinarios: Veterinario[];

@@ -1,6 +1,5 @@
-// components/VeterinarioModal.tsx
 import { Veterinario } from "@/src/models/Veterinario";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   View,
@@ -30,9 +29,10 @@ export default function VeterinarioModal({
 }: Props) {
   const [nome, setNome] = useState("");
   const [crmv, setCrmv] = useState("");
-  const [estado, setEstado] = useState("");
   const [cep, setCep] = useState("");
   const [endereco, setEndereco] = useState("");
+  const [mostrarEndereco, setMostrarEndereco] = useState(false);
+  const [fotoUrl, setFotoUrl] = useState("");
   const [error, setError] = useState<{
     nome?: string;
     crmv?: string;
@@ -63,12 +63,15 @@ export default function VeterinarioModal({
           `${data.tipo_logradouro} ${data.logradouro}, ${data.bairro}, ${data.cidade} - ${data.uf}`
         );
         setError((prev) => ({ ...prev, cep: undefined }));
+        setMostrarEndereco(true);
       } else {
         setError((prev) => ({ ...prev, cep: "CEP inválido!" }));
         setEndereco("");
+        setMostrarEndereco(false);
       }
     } catch (error) {
       Alert.alert("Erro", "Não foi possível buscar o CEP.");
+      setMostrarEndereco(false);
     }
   };
 
@@ -76,16 +79,19 @@ export default function VeterinarioModal({
     if (visible && veterinarioSelecionado) {
       setNome(veterinarioSelecionado.nome);
       setCrmv(veterinarioSelecionado.crmv);
-      setEstado(veterinarioSelecionado.estado);
+      setCep(veterinarioSelecionado.cep ?? "");
+      setEndereco(veterinarioSelecionado.endereco ?? "");
+      setFotoUrl(veterinarioSelecionado.fotoUrl ?? "");
       setError({});
+      setMostrarEndereco(false); // resetar sempre
     } else if (!visible) {
-      // Limpar campos ao fechar o modal
       setNome("");
       setCrmv("");
-      setEstado("");
       setCep("");
       setEndereco("");
+      setFotoUrl("");
       setError({});
+      setMostrarEndereco(false);
     }
   }, [veterinarioSelecionado, visible]);
 
@@ -95,9 +101,10 @@ export default function VeterinarioModal({
     const novoVeterinario = {
       nome,
       crmv,
-      estado,
-      ccpsId: 1,
-      fotoUrl: veterinarioSelecionado?.fotoUrl,
+      cep,
+      endereco,
+      fotoUrl,
+      ccpsId: veterinarioSelecionado?.ccpsId ?? 1,
     };
 
     if (veterinarioSelecionado?.id) {
@@ -105,10 +112,8 @@ export default function VeterinarioModal({
         ...novoVeterinario,
         id: veterinarioSelecionado.id,
       };
-      console.log("Atualizando:", comId);
       onAtualizar(comId);
     } else {
-      console.log("Novo veterinário sendo salvo:", novoVeterinario);
       onSalvar(novoVeterinario);
     }
 
@@ -138,13 +143,12 @@ export default function VeterinarioModal({
           />
           {error.crmv && <Text style={styles.error}>{error.crmv}</Text>}
 
-          <Text style={styles.label}>Estado (UF)</Text>
+          <Text style={styles.label}>URL da foto de perfil</Text>
           <TextInput
             style={styles.input}
-            placeholder="BA, SP, etc."
-            value={estado}
-            onChangeText={(text) => setEstado(text.toUpperCase())}
-            maxLength={2}
+            placeholder="https://exemplo.com/foto.jpg"
+            value={fotoUrl}
+            onChangeText={setFotoUrl}
           />
 
           <Text style={styles.label}>CEP</Text>
@@ -162,17 +166,13 @@ export default function VeterinarioModal({
           />
           {error.cep && <Text style={styles.error}>{error.cep}</Text>}
 
-          {endereco ? (
-            <>
-              <Text style={styles.label}>Endereço</Text>
-              <Text style={{ marginBottom: 10 }}>{endereco}</Text>
-            </>
+          {mostrarEndereco && endereco && !error.cep ? (
+            <Text style={styles.address}>{endereco}</Text>
           ) : null}
 
           <TouchableOpacity style={styles.button} onPress={handleSalvar}>
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
-
           <Button title="Cancelar" onPress={onClose} color="red" />
         </View>
       </View>
@@ -226,6 +226,14 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     fontSize: 12,
+    marginBottom: 10,
+  },
+  address: {
+    fontSize: 14,
+    color: "#333",
+    backgroundColor: "#e9ecef",
+    padding: 10,
+    borderRadius: 5,
     marginBottom: 10,
   },
 });

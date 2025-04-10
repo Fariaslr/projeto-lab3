@@ -10,7 +10,8 @@ export function initializeDatabase() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         crmv TEXT NOT NULL,
-        estado TEXT NOT NULL,
+        cep TEXT NOT NULL,
+        endereco TEXT,
         fotoUrl TEXT,
         ccpsId INTEGER NOT NULL
       );

@@ -29,7 +29,7 @@ export const VeterinarioService = {
       set: {
         nome: v.nome,
         crmv: v.crmv,
-        estado: v.estado,
+        cep: v.cep,
         fotoUrl: v.fotoUrl,
         ccpsId: v.ccpsId,
       },
