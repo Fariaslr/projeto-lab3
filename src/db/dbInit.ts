@@ -1,44 +1,54 @@
 import { openDatabaseSync } from "expo-sqlite";
 import { DATABASE_NAME } from "./schema";
 import * as FileSystem from "expo-file-system";
+import * as Crypto from "expo-crypto";
 
-export function initializeDatabase() {
+export async function initializeDatabase() {
   const db = openDatabaseSync(DATABASE_NAME);
 
   try {
-    // Ativa suporte a chave estrangeira
+    const senhaOriginal = "senha123";
+    const senhaCriptografada = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      senhaOriginal
+    );
+
     db.execSync(`PRAGMA foreign_keys = ON;`);
 
-    // Cria a tabela de CCPS
-    db.execSync(`
+    db.runSync(`
       CREATE TABLE IF NOT EXISTS ccps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nomeCcps TEXT NOT NULL,
-        cnpj TEXT NOT NULL,
-        cep TEXT NOT NULL,
-        endereco TEXT NOT NULL,
-        cidade TEXT NOT NULL,
-        estado TEXT NOT NULL,
-        codigoAprovado TEXT NOT NULL,
-        dataValidade TEXT NOT NULL
+        nomeCcps TEXT,
+        cnpj TEXT NOT NULL UNIQUE,
+        senha TEXT NOT NULL,
+        cep TEXT,
+        telefone TEXT,
+        endereco TEXT,
+        cidade TEXT,
+        estado TEXT,
+        codigoAprovado TEXT,
+        dataValidade TEXT
       );
     `);
     console.log("Tabela ccps criada ou já existia.");
 
-    db.runSync(`
-        INSERT INTO ccps (
-          nomeCcps, cnpj, cep, endereco, cidade, estado, codigoAprovado, dataValidade
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-      `, [
-      "Centro de Reprodução Equina",
-      "12.345.678/0001-99",
-      "12345-678",
-      "Rua das Éguas, 123",
-      "Camaçari",
-      "BA",
-      "APROVADO123",
-      "2025-12-31"
-    ]);
+    db.runSync(
+      `INSERT INTO ccps (
+        nomeCcps, cnpj, senha, telefone, cep, endereco, cidade, estado, codigoAprovado, dataValidade
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      [
+        "Centro de Reprodução Equina",
+        "12345678000199",
+        senhaCriptografada,
+        "(71) 91234-5678",
+        "12345-678",
+        "Rua das Éguas, 123",
+        "Camaçari",
+        "BA",
+        "APROVADO123",
+        "2025-12-31",
+      ]
+    );    
     console.log("Registro inicial do CCPS inserido.");
 
     db.execSync(`
@@ -47,12 +57,11 @@ export function initializeDatabase() {
         nome TEXT NOT NULL,
         crmv TEXT NOT NULL,
         fotoUrl TEXT,
-        ccpsId INTEGER NOT NULL,
+        ccpsId INTEGER,
         FOREIGN KEY (ccpsId) REFERENCES ccps(id)
       );
     `);
-    console.log("Tabela veterinarios criada");
-
+    console.log("Tabela veterinarios criada.");
   } catch (error) {
     console.error("Erro ao criar tabelas ou inserir registro:", error);
   }
@@ -66,5 +75,16 @@ export async function dropDatabase() {
     console.log("Banco de dados deletado.");
   } else {
     console.log("Banco de dados não encontrado.");
+  }
+}
+
+export async function selectCcps(): Promise<any[]> {
+  const db = openDatabaseSync(DATABASE_NAME);
+  try {
+    const resultados = db.getAllSync("SELECT * FROM ccps;");
+    return resultados;
+  } catch (error) {
+    console.error("Erro ao buscar registros da tabela ccps:", error);
+    return [];
   }
 }

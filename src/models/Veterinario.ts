@@ -1,5 +1,5 @@
 export type Veterinario = {
-  id: string;
+  id: number;
   nome: string;
   crmv: string;
   fotoUrl?: string;

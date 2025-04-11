@@ -1,23 +1,26 @@
-import { sqliteTable, text } from "drizzle-orm/sqlite-core";
+// db/schema.ts
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const DATABASE_NAME = "ccps.db";
 
 export const ccpsTable = sqliteTable("ccps", {
-  id: text("id").primaryKey().notNull(),
-  nomeEstabelecimento: text("nome_estabelecimento").notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  nomeCcps: text("nomeCcps").notNull(),        // <- Agora está igual ao modelo
   cnpj: text("cnpj").notNull(),
+  senha: text("senha").notNull(),
   telefone: text("telefone"),
-  email: text("email"),
   cep: text("cep"),
   endereco: text("endereco"),
-  municipio: text("municipio"),
+  cidade: text("cidade"),
   estado: text("estado"),
+  codigoAprovado: text("codigoAprovado"),
+  dataValidade: text("dataValidade"),
 });
 
 export const veterinariosTable = sqliteTable("veterinarios", {
-  id: text("id").primaryKey().notNull(), 
+  id: integer("id").primaryKey({ autoIncrement: true }),
   nome: text("nome").notNull(),
   crmv: text("crmv").notNull(),
   fotoUrl: text("fotoUrl"),
-  ccpsId: text("ccpsId").notNull(),
+  ccpsId: integer("ccpsId").notNull(),
 });

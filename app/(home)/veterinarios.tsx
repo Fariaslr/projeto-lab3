@@ -15,7 +15,6 @@ export default function Veterinarios() {
 
   useEffect(() => {
     const carregarVeterinarios = async () => {
-      initializeDatabase();
       const dados = await VeterinarioService.listarPorCcps(ccpsId);
       setVeterinarios(dados);
     };
@@ -46,7 +45,7 @@ export default function Veterinarios() {
   };
   
 
-  const removerVeterinario = async (id: string) => {
+  const removerVeterinario = async (id: number) => {
     await VeterinarioService.remover(id);
     const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
     setVeterinarios(atualizados);
