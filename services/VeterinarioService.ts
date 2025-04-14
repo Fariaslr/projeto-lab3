@@ -37,7 +37,7 @@ export const VeterinarioService = {
     });
   },
 
-  async remover(id: number) {
+  async remover(id: string) {
     await DZSQLiteDelete(veterinariosTable, {
       where: eq(veterinariosTable.id, id)
     });

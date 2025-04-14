@@ -3,7 +3,7 @@ import { Veterinario } from '../src/models/Veterinario';
 
 type Props = {
   veterinarios: Veterinario[];
-  onRemover: (id: number) => void;
+  onRemover: (id: string) => void;
   onEditar: (veterinario: Veterinario) => void;
 };
 
@@ -16,9 +16,9 @@ export default function FlatListVeterinarios({
   return (
     <FlatList
       data={veterinarios}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <View style={styles.card}>
+        <View style={styles.card}> 
           <View style={styles.header}>
             <Image
               source={{
@@ -29,7 +29,7 @@ export default function FlatListVeterinarios({
             <View style={{ marginLeft: 12 }}>
               <Text style={styles.nome}>{item.nome}</Text>
               <Text>
-                {item.crmv} - {item.estado}
+                {item.id} - {item.crmv}
               </Text>
             </View>
           </View>

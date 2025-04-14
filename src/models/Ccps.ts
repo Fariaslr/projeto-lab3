@@ -1,5 +1,5 @@
 export type Ccps = {
-    id: number;
+    id: string;
     nomeCcps: string;
     cnpj: string;
     cep: string;

@@ -1,4 +1,4 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text , integer} from "drizzle-orm/sqlite-core";
 
 export const DATABASE_NAME = "ccps.db";
 
@@ -23,3 +23,4 @@ export const ccps = sqliteTable("ccps", {
   municipio: text("municipio"),
   estado: text("estado"),
 });
+
