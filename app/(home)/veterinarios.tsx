@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import FlatListVeterinarios from "@/components/VeterinarioFlatList";
 import { Veterinario } from "@/src/models/Veterinario";
@@ -12,12 +12,20 @@ export default function Veterinarios() {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [ccpsId, setCcpsId] = useState<number | null>(null);
 
+  // Função para atualizar a lista de veterinários
+  const atualizarLista = async () => {
+    if (ccpsId !== null) {
+      const dados = await VeterinarioService.listarPorCcps(ccpsId);
+      setVeterinarios(dados);
+    }
+  };
+
   useEffect(() => {
     const carregarCcpsId = async () => {
       const usuarioJson = await SecureStore.getItemAsync("usuario");
       if (usuarioJson) {
         const usuario = JSON.parse(usuarioJson);
-        setCcpsId(usuario.id); // ou usuario.ccpsId, dependendo da estrutura
+        setCcpsId(usuario.id);
       }
     };
     carregarCcpsId();
@@ -25,11 +33,7 @@ export default function Veterinarios() {
 
   useEffect(() => {
     if (ccpsId !== null) {
-      const carregarVeterinarios = async () => {
-        const dados = await VeterinarioService.listarPorCcps(ccpsId);
-        setVeterinarios(dados);
-      };
-      carregarVeterinarios();
+      atualizarLista();
     }
   }, [ccpsId]);
 
@@ -45,23 +49,29 @@ export default function Veterinarios() {
 
   const salvarNovoVeterinario = async (v: Omit<Veterinario, "id">) => {
     if (ccpsId === null) return;
-    await VeterinarioService.salvar({ ...v, ccpsId }); // adiciona ccpsId antes de salvar
-    const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
-    setVeterinarios(atualizados);
+    await VeterinarioService.salvar({ ...v, ccpsId });
+    atualizarLista();
   };
 
   const atualizarVeterinario = async (v: Veterinario) => {
     await VeterinarioService.atualizar(v);
-    const atualizados = await VeterinarioService.listarPorCcps(v.ccpsId);
-    setVeterinarios(atualizados);
+    atualizarLista();
   };
 
   const removerVeterinario = async (id: number) => {
     if (ccpsId === null) return;
     await VeterinarioService.remover(id);
-    const atualizados = await VeterinarioService.listarPorCcps(ccpsId);
-    setVeterinarios(atualizados);
+    atualizarLista();
   };
+
+  // Mostrar carregando enquanto os dados são obtidos
+  if (ccpsId === null || veterinarios.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007bff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
