@@ -2,41 +2,46 @@ import { openDatabaseSync } from "expo-sqlite";
 import { DATABASE_NAME } from "./schema";
 import * as FileSystem from "expo-file-system";
 
-export function initializeDatabase() {
+export async function initializeDatabase() {
   const db = openDatabaseSync(DATABASE_NAME);
 
   try {
     db.execSync(`PRAGMA foreign_keys = ON;`);
 
-    db.execSync(`
-      CREATE TABLE IF NOT EXISTS ccps (
+
+    db.runSync(`CREATE TABLE IF NOT EXISTS ccps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nomeCcps TEXT NOT NULL,
-        cnpj TEXT NOT NULL,
-        cep TEXT NOT NULL,
-        endereco TEXT NOT NULL,
-        cidade TEXT NOT NULL,
-        estado TEXT NOT NULL,
-        codigoAprovado TEXT NOT NULL,
-        dataValidade TEXT NOT NULL
+        nomeCcps TEXT,
+        cnpj TEXT NOT NULL UNIQUE,
+        senha TEXT NOT NULL,
+        cep TEXT,
+        telefone TEXT,
+        endereco TEXT,
+        cidade TEXT,
+        estado TEXT,
+        codigoAprovado TEXT,
+        dataValidade TEXT
       );
     `);
     console.log("Tabela ccps criada ou já existia.");
 
-    db.runSync(`
-        INSERT INTO ccps (
-          nomeCcps, cnpj, cep, endereco, cidade, estado, codigoAprovado, dataValidade
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-      `, [
-      "Centro de Reprodução Equina",
-      "12.345.678/0001-99",
-      "12345-678",
-      "Rua das Éguas, 123",
-      "Camaçari",
-      "BA",
-      "APROVADO123",
-      "2025-12-31"
-    ]);
+    db.runSync(
+      `INSERT INTO ccps (
+        nomeCcps, cnpj, senha, telefone, cep, endereco, cidade, estado, codigoAprovado, dataValidade
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+      [
+        "Centro de Reprodução Equina",
+        "12345678000199",
+        "senha123",
+        "(71) 91234-5678",
+        "12345-678",
+        "Rua das Éguas, 123",
+        "Camaçari",
+        "BA",
+        "APROVADO123",
+        "2025-12-31",
+      ]
+    );    
     console.log("Registro inicial do CCPS inserido.");
 
     db.execSync(`
@@ -47,12 +52,11 @@ export function initializeDatabase() {
         cep TEXT NOT NULL,
         endereco TEXT,
         fotoUrl TEXT,
-        ccpsId INTEGER NOT NULL,
+        ccpsId INTEGER,
         FOREIGN KEY (ccpsId) REFERENCES ccps(id)
       );
     `);
-    console.log("Tabela veterinarios criada");
-
+    console.log("Tabela veterinarios criada.");
   } catch (error) {
     console.error("Erro ao criar tabelas ou inserir registro:", error);
   }
@@ -68,3 +72,15 @@ export async function dropDatabase() {
     console.log("Banco de dados não encontrado.");
   }
 }
+
+export async function selectCcps(): Promise<any[]> {
+  const db = openDatabaseSync(DATABASE_NAME);
+  try {
+    const resultados = db.getAllSync("SELECT * FROM ccps;");
+    return resultados;
+  } catch (error) {
+    console.error("Erro ao buscar registros da tabela ccps:", error);
+    return [];
+  }
+}
+

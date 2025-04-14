@@ -32,9 +32,7 @@ export default function VeterinarioModal({
 }: Props) {
   const [nome, setNome] = useState("");
   const [crmv, setCrmv] = useState("");
-  const [estado, setEstado] = useState("");
-  const [cep, setCep] = useState("");
-  const [endereco, setEndereco] = useState("");
+  const [fotoUrl, setFotoUrl] = useState("");
   const [error, setError] = useState<{
     nome?: string;
     crmv?: string;
@@ -48,44 +46,17 @@ export default function VeterinarioModal({
     return Object.keys(errors).length === 0;
   };
 
-  const buscarCep = async (cep: string) => {
-    if (cep.length !== 9) return;
-
-    try {
-      const response = await fetch(
-        `http://cep.republicavirtual.com.br/web_cep.php?cep=${cep}&formato=json`
-      );
-      const data = await response.json();
-
-      if (data.resultado === "1") {
-        setEndereco(
-          `${data.tipo_logradouro} ${data.logradouro}, ${data.bairro}, ${data.cidade} - ${data.uf}`
-        );
-        setError((prev) => ({ ...prev, cep: undefined }));
-      } else {
-        setError((prev) => ({ ...prev, cep: "CEP inválido!" }));
-        setEndereco("");
-      }
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível buscar o CEP.");
-    }
-  };
-
   useEffect(() => {
     if (visible && veterinarioSelecionado) {
       setNome(veterinarioSelecionado.nome);
       setCrmv(veterinarioSelecionado.crmv);
-      setEstado(veterinarioSelecionado.estado);
+      setFotoUrl(veterinarioSelecionado.fotoUrl ?? "");
       setError({});
-      setMostrarEndereco(false); // resetar sempre
     } else if (!visible) {
       setNome("");
       setCrmv("");
-      setEstado("");
-      setCep("");
-      setEndereco("");
+      setFotoUrl("");
       setError({});
-      setMostrarEndereco(false);
     }
   }, [veterinarioSelecionado, visible]);
 
@@ -95,9 +66,8 @@ export default function VeterinarioModal({
     const novoVeterinario = {
       nome,
       crmv,
-      estado,
-      ccpsId: 1,
-      fotoUrl: veterinarioSelecionado?.fotoUrl,
+      fotoUrl,
+      ccpsId: Number(veterinarioSelecionado?.ccpsId ?? 1),
     };
     
     if (veterinarioSelecionado?.id) {
@@ -199,40 +169,10 @@ export default function VeterinarioModal({
           />
           {error.crmv && <Text style={styles.error}>{error.crmv}</Text>}
 
-          <Text style={styles.label}>Estado (UF)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="BA, SP, etc."
-            value={estado}
-            onChangeText={(text) => setEstado(text.toUpperCase())}
-            maxLength={2}
-          />
-
-          <Text style={styles.label}>CEP</Text>
-          <MaskedTextInput
-            mask="99999-999"
-            style={styles.input}
-            placeholder="40010-000"
-            keyboardType="numeric"
-            value={cep}
-            onChangeText={(text) => {
-              setCep(text);
-              setError((prev) => ({ ...prev, cep: undefined }));
-              if (text.length === 9) buscarCep(text);
-            }}
-          />
-          {error.cep && <Text style={styles.error}>{error.cep}</Text>}
-
-          {endereco ? (
-            <>
-              <Text style={styles.label}>Endereço</Text>
-              <Text style={{ marginBottom: 10 }}>{endereco}</Text>
-            </>
-          ) : null}
-
           <TouchableOpacity style={styles.button} onPress={handleSalvar}>
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
+
           <Button title="Cancelar" onPress={onClose} color="red" />
         </View>
       </View>
@@ -297,4 +237,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
   },
+  fotoContainer: {
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  imagemTopo: {
+    width: 120,
+    height: 120,
+    borderWidth: 1,
+    borderRadius: 60,
+  },
+  placeholder: {
+    backgroundColor: "#ccc",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  placeholderText: {
+    color: "#fff",
+    fontWeight: "bold",
+  }
 });
