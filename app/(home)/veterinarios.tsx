@@ -63,15 +63,6 @@ export default function Veterinarios() {
     atualizarLista();
   };
 
-  // Mostrar carregando enquanto os dados são obtidos
-  if (ccpsId === null || veterinarios.length === 0) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007bff" />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>Equipe Técnica - Veterinários</Text>
