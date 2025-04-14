@@ -13,7 +13,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { MaskedTextInput } from "react-native-mask-text";
 import { CcpsService } from "@/services/CcpsService";
-import * as Crypto from "expo-crypto";
 import { selectCcps } from "@/src/db/dbInit";
 
 export default function RegisterCcps() {
@@ -73,23 +72,11 @@ export default function RegisterCcps() {
     return Object.keys(errors).length === 0;
   };
 
-  const hashSenha = async (senha: string): Promise<string> => {
-    return await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      senha
-    );
-  };
-
   const handleNext = async () => {
     if (!validateFields()) return;
 
     try {
       const cnpjNormalizado = cnpj.replace(/\D/g, "");
-      const senhaOriginal = senha;
-          const senhaCriptografada = await Crypto.digestStringAsync(
-            Crypto.CryptoDigestAlgorithm.SHA256,
-            senhaOriginal
-          );
 
       await CcpsService.salvar({
         nomeCcps: nome,
@@ -101,7 +88,7 @@ export default function RegisterCcps() {
         estado: endereco.split("-")[1]?.trim(),
         codigoAprovado: "APROVADO123",
         dataValidade: "2025-12-31",
-        senha: senhaCriptografada,
+        senha
       });
 
       Alert.alert("Sucesso", "CCPS cadastrado com sucesso!");

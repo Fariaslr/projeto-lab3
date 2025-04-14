@@ -7,22 +7,8 @@ import {
 import { ccpsTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 import { Ccps } from "@/src/models/Ccps";
-import * as Crypto from "expo-crypto";
-
-/**
- * Gera um hash SHA-256 da senha informada
- */
-async function hashSenha(senha: string): Promise<string> {
-  return await Crypto.digestStringAsync(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    senha
-  );
-}
 
 export const CcpsService = {
-  /**
-   * Lista todos os registros CCPS
-   */
   async listarTodos(): Promise<Ccps[]> {
     try {
       const ccps = await DZSQLiteSelect<Ccps>(ccpsTable);
@@ -34,9 +20,6 @@ export const CcpsService = {
     }
   },
 
-  /**
-   * Autentica um CCPS pelo CNPJ (sem verificar senha)
-   */
   async autenticarPorCnpj(cnpj: string): Promise<Ccps | null> {
     try {
       const ccps = await DZSQLiteSelect<Ccps>(ccpsTable);
@@ -51,11 +34,8 @@ export const CcpsService = {
 
   async salvar(ccps: Omit<Ccps, "id">) {
     try {
-      const senhaCriptografada = await hashSenha(ccps.senha);
-      const ccpsComSenha = { ...ccps, senha: senhaCriptografada };
-
-      console.log("Salvando CCPS:", ccpsComSenha);
-      await DZSQLiteInsert(ccpsTable, ccpsComSenha);
+      console.log("Salvando CCPS:", ccps);
+      await DZSQLiteInsert(ccpsTable, ccps);
       console.log("CCPS inserido com sucesso!");
     } catch (error) {
       console.error("Erro ao inserir CCPS:", error);
@@ -74,6 +54,7 @@ export const CcpsService = {
           estado: ccps.estado,
           codigoAprovado: ccps.codigoAprovado,
           dataValidade: ccps.dataValidade,
+          senha: ccps.senha,
         },
         where: eq(ccpsTable.id, ccps.id!),
       });
@@ -96,18 +77,15 @@ export const CcpsService = {
 
   async autenticar(cnpj: string, senha: string): Promise<Ccps | null> {
     try {
-      const senhaCriptografada = await hashSenha(senha);
       const ccps = await DZSQLiteSelect<Ccps>(ccpsTable);
-
       const resultado = ccps.find(
-        (item) => item.cnpj === cnpj && item.senha === senhaCriptografada
+        (item) => item.cnpj === cnpj && item.senha === senha
       );
-
       console.log("Resultado da autenticação:", resultado);
       return resultado ?? null;
     } catch (error) {
       console.error("Erro na autenticação:", error);
       return null;
     }
-  },
+  }
 };

@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { CcpsService } from "@/services/CcpsService";
 import * as SecureStore from "expo-secure-store"; 
 import { MaskedTextInput } from "react-native-mask-text";
+import { dropDatabase } from "@/src/db/dbInit";
 
 export default function LoginScreen() {
     const [password, setPassword] = useState("");
@@ -20,9 +21,7 @@ export default function LoginScreen() {
     const router = useRouter();
 
     const handleLogin = async () => {
-        // Remove qualquer caractere não numérico do CNPJ (normalização)
         const cnpjNormalizado = cnpj.replace(/\D/g, "");
-
         const usuario = await CcpsService.autenticar(cnpjNormalizado, password); 
         if (usuario) {
             await SecureStore.setItemAsync("usuario", JSON.stringify(usuario));

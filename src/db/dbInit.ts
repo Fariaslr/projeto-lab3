@@ -1,18 +1,11 @@
 import { openDatabaseSync } from "expo-sqlite";
 import { DATABASE_NAME } from "./schema";
 import * as FileSystem from "expo-file-system";
-import * as Crypto from "expo-crypto";
 
 export async function initializeDatabase() {
   const db = openDatabaseSync(DATABASE_NAME);
 
-  try {
-    const senhaOriginal = "senha123";
-    const senhaCriptografada = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      senhaOriginal
-    );
-
+  try { 
     db.execSync(`PRAGMA foreign_keys = ON;`);
 
     db.runSync(`
@@ -39,7 +32,7 @@ export async function initializeDatabase() {
       [
         "Centro de Reprodução Equina",
         "12345678000199",
-        senhaCriptografada,
+        "senha123",
         "(71) 91234-5678",
         "12345-678",
         "Rua das Éguas, 123",

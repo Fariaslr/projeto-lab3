@@ -2,6 +2,7 @@ import { DZSQLiteInsert, DZSQLiteSelect, DZSQLiteUpdate, DZSQLiteDelete } from "
 import { veterinariosTable } from "@/src/db/schema";
 import { eq } from "drizzle-orm";
 import { Veterinario } from "@/src/models/Veterinario";
+import { selectCcps } from "@/src/db/dbInit";
 
 export const VeterinarioService = {
   async listarPorCcps(ccpsId: number): Promise<Veterinario[]> {
@@ -18,6 +19,7 @@ export const VeterinarioService = {
     try {
       console.log("Veterinário service " + v.crmv);
       await DZSQLiteInsert(veterinariosTable, v);
+      selectCcps();
       console.log("Veterinário inserido com sucesso!");
     } catch (error) {
       console.error("Erro ao inserir veterinário:", error);
