@@ -23,7 +23,7 @@ const HomeScreen = () => {
         const usuarioJson = await SecureStore.getItemAsync("usuario");
         if (usuarioJson) {
           const usuario = JSON.parse(usuarioJson);
-          setCcpsId(usuario.id); // Define o ccpsId com base no usuário
+          setCcpsId(usuario.id);
           const total = await DashboardService.contarVeterinarios(usuario.id);
           setQuantidadeVeterinarios(total);
         }

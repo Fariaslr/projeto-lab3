@@ -5,11 +5,11 @@ import * as FileSystem from "expo-file-system";
 export async function initializeDatabase() {
   const db = openDatabaseSync(DATABASE_NAME);
 
-  try { 
+  try {
     db.execSync(`PRAGMA foreign_keys = ON;`);
 
-    db.runSync(`
-      CREATE TABLE IF NOT EXISTS ccps (
+
+    db.runSync(`CREATE TABLE IF NOT EXISTS ccps (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nomeCcps TEXT,
         cnpj TEXT NOT NULL UNIQUE,
@@ -49,6 +49,8 @@ export async function initializeDatabase() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         crmv TEXT NOT NULL,
+        cep TEXT NOT NULL,
+        endereco TEXT,
         fotoUrl TEXT,
         ccpsId INTEGER,
         FOREIGN KEY (ccpsId) REFERENCES ccps(id)

@@ -12,7 +12,6 @@ export default function Veterinarios() {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [ccpsId, setCcpsId] = useState<number | null>(null);
 
-  // Função para atualizar a lista de veterinários
   const atualizarLista = async () => {
     if (ccpsId !== null) {
       const dados = await VeterinarioService.listarPorCcps(ccpsId);
@@ -63,15 +62,6 @@ export default function Veterinarios() {
     await VeterinarioService.remover(id);
     atualizarLista();
   };
-
-  // Mostrar carregando enquanto os dados são obtidos
-  if (ccpsId === null || veterinarios.length === 0) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007bff" />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>

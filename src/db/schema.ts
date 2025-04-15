@@ -4,7 +4,7 @@ export const DATABASE_NAME = "ccps.db";
 
 export const ccpsTable = sqliteTable("ccps", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  nomeCcps: text("nomeCcps").notNull(),      
+  nomeCcps: text("nomeCcps").notNull(),       
   cnpj: text("cnpj").notNull(),
   senha: text("senha").notNull(),
   telefone: text("telefone"),
