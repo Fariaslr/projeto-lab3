@@ -1,11 +1,10 @@
-// db/schema.ts
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const DATABASE_NAME = "ccps.db";
 
 export const ccpsTable = sqliteTable("ccps", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  nomeCcps: text("nomeCcps").notNull(),        // <- Agora está igual ao modelo
+  nomeCcps: text("nomeCcps").notNull(),      
   cnpj: text("cnpj").notNull(),
   senha: text("senha").notNull(),
   telefone: text("telefone"),
